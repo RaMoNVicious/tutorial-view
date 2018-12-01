@@ -1,3 +1,14 @@
+/**
+ * File TutorialView
+ *
+ * JDK version 8
+ *
+ * @author RaMoNVicious
+ * @category tutorial-view
+ * @copyright 2017-2018 RaMoNVicious
+ * @created 28.11.18 13:46
+ */
+
 package cg.viciousconcepts.tutorialview;
 
 import android.app.Activity;
@@ -24,24 +35,44 @@ import android.widget.TextView;
 import cg.viciousconcepts.tutorialview.models.TargetPosition;
 import cg.viciousconcepts.tutorialview.models.TutorialTargetType;
 
+/**
+ * Class TutorialView
+ *
+ * JDK version 8
+ *
+ * @author RaMoNVicious
+ * @category tutorial-view
+ * @package cg.viciousconcepts.tutorialview
+ * @copyright 2017-2018 RaMoNVicious
+ * @created 28.11.18 13:46
+ */
+
 public class TutorialView extends FrameLayout {
 
-    public interface OnTutorialListener {
-
+    public interface OnTutorialEndsListener {
         void onTutorialEnds();
     }
 
+    public interface OnTutorialShowListener {
+        void onTutorialShow();
+    }
+
     FrameLayout frame;
-    ImageView arrowTopLeft, arrowTop, arrowTopRight, arrowBottomLeft, arrowBottom, arrowBottomRight;
-    TextView txtTitle, txtDescription;
+    ImageView arrowTopLeft;
+    ImageView arrowTop;
+    ImageView arrowTopRight;
+    ImageView arrowBottomLeft;
+    ImageView arrowBottom;
+    ImageView arrowBottomRight;
+    TextView txtTitle;
+    TextView txtDescription;
 
     private View target;
     private CharSequence title;
     private CharSequence description;
-    private OnClickListener onClickListener;
-    private OnTutorialListener onTutorialListener;
+    private OnTutorialEndsListener onTutorialEndsListener;
+    private OnTutorialShowListener onTutorialShowListener;
 
-    private boolean isShowOnce;
     private boolean isShowing;
 
     protected TutorialView(Context context) {
@@ -117,23 +148,26 @@ public class TutorialView extends FrameLayout {
         this.description = description;
     }
 
-    @Override
-    public void setOnClickListener(OnClickListener onClickListener) {
-        this.onClickListener = onClickListener;
+    public OnTutorialEndsListener getOnTutorialEndsListener() {
+        return onTutorialEndsListener;
     }
 
-    public OnTutorialListener getOnTutorialListener() {
-        return onTutorialListener;
+    public void setOnTutorialEndsListener(OnTutorialEndsListener onTutorialEndsListener) {
+        this.onTutorialEndsListener = onTutorialEndsListener;
     }
 
-    public void setOnTutorialListener(OnTutorialListener onTutorialListener) {
-        this.onTutorialListener = onTutorialListener;
+    public OnTutorialShowListener getOnTutorialShowListener() {
+        return onTutorialShowListener;
+    }
+
+    public void setOnTutorialShowListener(OnTutorialShowListener onTutorialShowListener) {
+        this.onTutorialShowListener = onTutorialShowListener;
     }
 
     public void show() {
         isShowing = true;
 
-        View tutorialViewLayout = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.widget_tutorial, null);
+        View tutorialViewLayout = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.tutorial, null);
         addView(tutorialViewLayout);
 
         frame = ((Activity) getContext()).findViewById(R.id.frame);
@@ -158,8 +192,8 @@ public class TutorialView extends FrameLayout {
             ViewGroup viewGroup = ((ViewGroup) getParent());
             if (viewGroup != null) viewGroup.removeView(this);
 
-            if (onTutorialListener != null && !force) {
-                onTutorialListener.onTutorialEnds();
+            if (onTutorialEndsListener != null && !force) {
+                onTutorialEndsListener.onTutorialEnds();
             }
         }
     }
@@ -171,7 +205,10 @@ public class TutorialView extends FrameLayout {
             public void onAnimationStart(Animation animation) { /* */ }
 
             @Override
-            public void onAnimationEnd(Animation animation) { /* */ }
+            public void onAnimationEnd(Animation animation) {
+                if (onTutorialShowListener != null)
+                    onTutorialShowListener.onTutorialShow();
+            }
 
             @Override
             public void onAnimationRepeat(Animation animation) { /* */ }
@@ -241,17 +278,10 @@ public class TutorialView extends FrameLayout {
             return tutorialView;
         }
 
-        public Builder setTarget(View view, TutorialTargetType targetType) {
-            return setTarget(view, null, targetType);
-        }
-
-        Builder setTarget(View view, Bitmap bitmap, TutorialTargetType targetType) {
+        Builder setTarget(View view, TutorialTargetType targetType) {
             tutorialView.setTarget(view);
             switch (targetType) {
                 default:
-                case TARGET_NONE:
-                case TARGET_POINT:
-                    break;
                 case TARGET_CIRCLE:
                     tutorialOverlay.setCircleTarget(view);
                     break;
@@ -288,8 +318,13 @@ public class TutorialView extends FrameLayout {
             return this;
         }
 
-        public Builder setOnTutorialEndsListener(OnTutorialListener onTutorialListener) {
-            tutorialView.setOnTutorialListener(onTutorialListener);
+        public Builder setOnTutorialEndsListener(OnTutorialEndsListener onTutorialEndsListener) {
+            tutorialView.setOnTutorialEndsListener(onTutorialEndsListener);
+            return this;
+        }
+
+        public Builder setOnTutorialShowListener(OnTutorialShowListener onTutorialShowListener) {
+            this.tutorialView.setOnTutorialShowListener(onTutorialShowListener);
             return this;
         }
 
@@ -311,9 +346,5 @@ public class TutorialView extends FrameLayout {
 
             return bitmap;
         }
-    }
-
-    private static String getViewKey(View view) {
-        return view.getClass().getName();
     }
 }

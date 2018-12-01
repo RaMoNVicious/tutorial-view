@@ -1,3 +1,14 @@
+/**
+ * File TutorialOverlay
+ * <p>
+ * JDK version 8
+ *
+ * @author RaMoNVicious
+ * @category tutorial-view
+ * @copyright 2017-2018 RaMoNVicious
+ * @created 28.11.18 13:46
+ */
+
 package cg.viciousconcepts.tutorialview;
 
 import android.content.Context;
@@ -14,6 +25,18 @@ import android.view.View;
 import cg.viciousconcepts.tutorialview.models.TargetPosition;
 import cg.viciousconcepts.tutorialview.models.TutorialTargetType;
 
+/**
+ * Class TutorialOverlay
+ *
+ * JDK version 8
+ *
+ * @author RaMoNVicious
+ * @category tutorial-view
+ * @package cg.viciousconcepts.tutorialview
+ * @copyright 2017-2018 RaMoNVicious
+ * @created 28.11.18 13:46
+ */
+
 public class TutorialOverlay extends android.support.v7.widget.AppCompatImageView {
 
     public interface OnTargetFound {
@@ -22,8 +45,6 @@ public class TutorialOverlay extends android.support.v7.widget.AppCompatImageVie
 
     private static final PorterDuffXfermode DRAW_MODE_NORMAL = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
     private static final PorterDuffXfermode DRAW_MODE_CLEAR = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
-
-    private TargetPosition targetPosition = TargetPosition.CENTER;
 
     private TutorialTargetType targetType;
 
@@ -52,18 +73,24 @@ public class TutorialOverlay extends android.support.v7.widget.AppCompatImageVie
         this.onTargetFoundListener = onTargetFoundListener;
     }
 
-    public void setEmptyTarget() {
-        targetType = TutorialTargetType.TARGET_NONE;
-    }
-
     public void setCircleTarget(View view) {
         targetType = TutorialTargetType.TARGET_CIRCLE;
 
         Rect rect = new Rect();
         view.getGlobalVisibleRect(rect);
 
+        if (rect.width() > rect.height()) {
+            float dSize = (rect.width() - rect.height()) / 2.0f;
+            rect.top -= dSize;
+            rect.bottom += dSize;
+        } else if (rect.width() < rect.height()) {
+            float dSize = (rect.height() - rect.width()) / 2.0f;
+            rect.left -= dSize;
+            rect.right += dSize;
+        }
+
         RectF rectF = new RectF(rect.left - viewMargin, rect.top - viewMargin, rect.right + viewMargin, rect.bottom + viewMargin);
-        round = Math.max(rectF.height(), rectF.width());
+        round = rectF.width() / 2.0f;
 
         setTarget(rectF);
     }
@@ -130,18 +157,23 @@ public class TutorialOverlay extends android.support.v7.widget.AppCompatImageVie
     }
 
     private void updateTargetPosition() {
-        ((View)getParent()).getGlobalVisibleRect(viewRect);
+        ((View) getParent()).getGlobalVisibleRect(viewRect);
         highlight.offset(-1f * viewRect.left, -1f * viewRect.top);
 
-        if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() <= viewRect.right / 3) {
+        if (targetType == TutorialTargetType.TARGET_RECTANGLE) {
+            tuneRectangle();
+        }
+
+        TargetPosition targetPosition;
+        if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() <= 0.25f * viewRect.right) {
             targetPosition = TargetPosition.TOP_LEFT;
-        } else if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() > viewRect.right / 3 && highlight.centerX() < viewRect.right * 2 / 3) {
+        } else if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() > 0.25f * viewRect.right && highlight.centerX() < 0.75f * viewRect.right) {
             targetPosition = TargetPosition.TOP;
-        } else if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() >= viewRect.right * 2 / 3) {
+        } else if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() >= viewRect.right * 0.75f) {
             targetPosition = TargetPosition.TOP_RIGHT;
-        } else if (highlight.centerY() >= viewRect.bottom / 2 && highlight.centerX() <= viewRect.right / 3) {
+        } else if (highlight.centerY() >= viewRect.bottom / 2 && highlight.centerX() <= 0.25f * viewRect.right) {
             targetPosition = TargetPosition.BOTTOM_LEFT;
-        } else if (highlight.centerY() >= viewRect.bottom / 2 && highlight.centerX() > viewRect.right / 3 && highlight.centerX() < viewRect.right * 2 / 3) {
+        } else if (highlight.centerY() >= viewRect.bottom / 2 && highlight.centerX() > 0.25f * viewRect.right && highlight.centerX() < 0.75f * viewRect.right) {
             targetPosition = TargetPosition.BOTTOM;
         } else {
             targetPosition = TargetPosition.BOTTOM_RIGHT;
@@ -149,6 +181,22 @@ public class TutorialOverlay extends android.support.v7.widget.AppCompatImageVie
 
         if (onTargetFoundListener != null) {
             onTargetFoundListener.targetFound(targetPosition, highlight);
+        }
+    }
+
+    private void tuneRectangle() {
+        if (highlight.width() >= highlight.height() && (highlight.left - viewRect.left > 0 || viewRect.right - highlight.right > 0)) {
+            highlight.top -= viewMargin / 2.0f;
+            highlight.bottom += viewMargin / 2.0f;
+            round = highlight.height() / 2.0f;
+            highlight.left -= round;
+            highlight.right += round;
+        } else if (highlight.width() < highlight.height() && (highlight.top - viewRect.top > 0 || viewRect.bottom - highlight.bottom > 0)) {
+            highlight.left -= viewMargin / 2.0f;
+            highlight.right += viewMargin / 2.0f;
+            round = highlight.width() / 2.0f;
+            highlight.top -= round;
+            highlight.bottom += round;
         }
     }
 }

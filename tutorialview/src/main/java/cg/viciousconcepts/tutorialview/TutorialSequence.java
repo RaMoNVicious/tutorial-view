@@ -1,29 +1,49 @@
+/**
+ * File TutorialSequence
+ *
+ * JDK version 8
+ *
+ * @author RaMoNVicious
+ * @category tutorial-view
+ * @copyright 2017-2018 RaMoNVicious
+ * @created 28.11.18 13:46
+ */
+
 package cg.viciousconcepts.tutorialview;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.StringRes;
 import android.util.Log;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import cg.viciousconcepts.tutorialview.models.TutorialItem;
+import cg.viciousconcepts.tutorialview.models.TutorialTargetType;
+
+/**
+ * Class TutorialSequence
+ *
+ * JDK version 8
+ *
+ * @author RaMoNVicious
+ * @category tutorial-view
+ * @package cg.viciousconcepts.tutorialview
+ * @copyright 2017-2018 RaMoNVicious
+ * @created 28.11.18 13:46
+ */
 
 public class TutorialSequence {
-
-    public interface SequenceListener {
-
-        void onTutorialShow();
-    }
 
     private static final String TAG = "Tutorial";
 
     private static final String SHARED_PREFERENCES_NAME = BuildConfig.APPLICATION_ID.concat(".sequence");
     private static final String IS_DONE = "isDone";
     private static final String LAST_SHOWN = "lastShown";
-    private boolean debugMode = false;
 
     private SharedPreferences sharedPreferences;
 
@@ -31,28 +51,13 @@ public class TutorialSequence {
     private int shownItem = -1;
     private List<TutorialItem> tutorialItems = new ArrayList<>();
     private String screenKey = "";
+    private boolean debugMode = false;
 
     private TutorialView tutorialView;
 
     private TutorialSequence(Activity activity) {
         sharedPreferences = activity.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         this.activity = activity;
-    }
-
-    private void addTutorialItem(TutorialItem tutorialItem) {
-        tutorialItems.add(tutorialItem);
-    }
-
-    private void setScreenKey(String screenKey) {
-        this.screenKey = screenKey;
-    }
-
-    private void setDebugMode(boolean debugMode) {
-        this.debugMode = debugMode;
-    }
-
-    private static void insertTutorialSequence(TutorialSequence tutorialSequence) {
-        tutorialSequence.start();
     }
 
     public void start() {
@@ -75,7 +80,7 @@ public class TutorialSequence {
     }
 
     public boolean back() {
-        if (tutorialView == null) {
+        if (tutorialView == null || shownItem == tutorialItems.size()) {
             return false;
         }
 
@@ -95,15 +100,16 @@ public class TutorialSequence {
     private void showTutorial() {
         if (shownItem <= tutorialItems.size() - 1) {
             TutorialItem item = tutorialItems.get(shownItem);
-            Log.d(TAG, activity.getString(item.getTitle()));
+            Log.d(TAG, item.getTitle());
 
-            tutorialView = new TutorialView.Builder(activity)
+            item.getTarget().post(() -> tutorialView = new TutorialView.Builder(activity)
                     .setTarget(item.getTarget(), item.getTargetType())
                     .setContentTitle(item.getTitle())
                     .setContentDescription(item.getDescription())
                     .setPerformClickOnTarget(item.isPerformViewClick())
                     .setOnTutorialEndsListener(this::showNext)
-                    .show();
+                    .setOnTutorialShowListener(item.getOnTutorialShowListener())
+                    .show());
         } else {
             sharedPreferences.edit().putBoolean(screenKey.concat(IS_DONE), true).apply();
         }
@@ -118,22 +124,42 @@ public class TutorialSequence {
         }
 
         public Builder setScreenKey(String screenKey) {
-            this.tutorialSequence.setScreenKey(screenKey);
+            this.tutorialSequence.screenKey = screenKey;
             return this;
         }
 
         public Builder debugMode() {
-            this.tutorialSequence.setDebugMode(true);
+            this.tutorialSequence.debugMode = true;
             return this;
         }
 
-        public Builder addTutorialItem(TutorialItem tutorialItem) {
-            this.tutorialSequence.addTutorialItem(tutorialItem);
+        private Builder addTutorialItem(TutorialItem tutorialItem) {
+            this.tutorialSequence.tutorialItems.add(tutorialItem);
             return this;
+        }
+
+        public Builder addTutorialItem(View view, TutorialTargetType targetType, String title, String description) {
+            TutorialItem tutorialItem = new TutorialItem(view, targetType, title, description);
+            return addTutorialItem(tutorialItem);
+        }
+
+        public Builder addTutorialItem(View view, TutorialTargetType targetType, String title, String description, TutorialView.OnTutorialShowListener onTutorialShowListener) {
+            TutorialItem tutorialItem = new TutorialItem(view, targetType, title, description, onTutorialShowListener);
+            return addTutorialItem(tutorialItem);
+        }
+
+        public Builder addTutorialItem(View view, TutorialTargetType targetType, @StringRes int titleId, @StringRes int descriptionId) {
+            TutorialItem tutorialItem = new TutorialItem(view, targetType, titleId, descriptionId);
+            return addTutorialItem(tutorialItem);
+        }
+
+        public Builder addTutorialItem(View view, TutorialTargetType targetType, @StringRes int titleId, @StringRes int descriptionId, TutorialView.OnTutorialShowListener onTutorialShowListener) {
+            TutorialItem tutorialItem = new TutorialItem(view, targetType, titleId, descriptionId, onTutorialShowListener);
+            return addTutorialItem(tutorialItem);
         }
 
         public TutorialSequence start() {
-            insertTutorialSequence(tutorialSequence);
+            tutorialSequence.start();
             return tutorialSequence;
         }
     }
