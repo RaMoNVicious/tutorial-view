@@ -9,7 +9,7 @@ import cg.viciousconcepts.tutorialview.models.TutorialTargetType;
 
 public class ActivityMain extends AppCompatActivity {
 
-    TextView txtHelloWorld;
+    TextView txtTop, txtTopRight, txtBottom, txtBottomRight;
 
     TutorialSequence tutorialSequence;
 
@@ -18,19 +18,31 @@ public class ActivityMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        txtHelloWorld = findViewById(R.id.txtHelloWorld);
+        txtTop = findViewById(R.id.txtTop);
+        txtTopRight = findViewById(R.id.txtTopRight);
+        txtBottom = findViewById(R.id.txtBottom);
+        txtBottomRight = findViewById(R.id.txtBottomRight);
 
         tutorialSequence = new TutorialSequence.Builder(this)
                 .debugMode()
-                .addTutorialItem(txtHelloWorld,
+                .addTutorialItem(txtTop,
                         TutorialTargetType.TARGET_RECTANGLE,
                         "Hello World!",
                         "This is Hello World label!")
-                .addTutorialItem(txtHelloWorld,
+                .addTutorialItem(txtTopRight,
+                        TutorialTargetType.TARGET_RECTANGLE,
+                        "Hello World!",
+                        "This is Hello World label!")
+                .addTutorialItem(txtBottom,
+                        TutorialTargetType.TARGET_RECTANGLE,
+                        "Hello World!",
+                        "This is Hello World label!")
+                .addTutorialItem(txtBottomRight,
                         TutorialTargetType.TARGET_CIRCLE,
                         "Goodbye World!",
-                        "This is Hello World label changed to Goodbye World label!",
-                        () -> txtHelloWorld.setText("Goodbye World!"))
+                        "This is Hello World label changed color after Tutorial shown!\n...and will change back after Tutorial ends.",
+                        () -> txtBottomRight.setTextColor(getResources().getColor(R.color.colorAccent)),
+                        () -> txtBottomRight.setTextColor(getResources().getColor(R.color.colorPrimaryDark)))
                 .start();
     }
 

@@ -165,15 +165,11 @@ public class TutorialOverlay extends android.support.v7.widget.AppCompatImageVie
         }
 
         TargetPosition targetPosition;
-        if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() <= 0.25f * viewRect.right) {
-            targetPosition = TargetPosition.TOP_LEFT;
-        } else if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() > 0.25f * viewRect.right && highlight.centerX() < 0.75f * viewRect.right) {
+        if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() <= 0.33f * viewRect.right) {
             targetPosition = TargetPosition.TOP;
-        } else if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() >= viewRect.right * 0.75f) {
+        } else if (highlight.centerY() < viewRect.bottom / 2 && highlight.centerX() > 0.33f * viewRect.right) {
             targetPosition = TargetPosition.TOP_RIGHT;
-        } else if (highlight.centerY() >= viewRect.bottom / 2 && highlight.centerX() <= 0.25f * viewRect.right) {
-            targetPosition = TargetPosition.BOTTOM_LEFT;
-        } else if (highlight.centerY() >= viewRect.bottom / 2 && highlight.centerX() > 0.25f * viewRect.right && highlight.centerX() < 0.75f * viewRect.right) {
+        } else if (highlight.centerY() >= viewRect.bottom / 2 && highlight.centerX() <= 0.33f * viewRect.right) {
             targetPosition = TargetPosition.BOTTOM;
         } else {
             targetPosition = TargetPosition.BOTTOM_RIGHT;
