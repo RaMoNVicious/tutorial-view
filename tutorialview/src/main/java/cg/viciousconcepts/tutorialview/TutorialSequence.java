@@ -108,10 +108,10 @@ public class TutorialSequence {
                     .setContentDescription(item.getDescription())
                     .setPerformClickOnTarget(item.isPerformViewClick())
                     .setOnTutorialEndsListener(() -> {
-                        if (item.getOnTutorialEndsListener() != null)
-                            item.getOnTutorialEndsListener().onTutorialEnds();
-                        showNext();
+                        if (item.getOnTutorialEndListener() != null)
+                            item.getOnTutorialEndListener().onTutorialEnds();
                     })
+                    .setOnTutorialDoneListener(this::showNext)
                     .setOnTutorialShowListener(item.getOnTutorialShowListener())
                     .show());
         } else {
@@ -147,8 +147,8 @@ public class TutorialSequence {
             return addTutorialItem(tutorialItem);
         }
 
-        public Builder addTutorialItem(View view, TutorialTargetType targetType, String title, String description, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndsListener onTutorialEndsListener) {
-            TutorialItem tutorialItem = new TutorialItem(view, targetType, title, description, onTutorialShowListener, onTutorialEndsListener);
+        public Builder addTutorialItem(View view, TutorialTargetType targetType, String title, String description, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndListener onTutorialEndListener) {
+            TutorialItem tutorialItem = new TutorialItem(view, targetType, title, description, onTutorialShowListener, onTutorialEndListener);
             return addTutorialItem(tutorialItem);
         }
 
@@ -157,8 +157,8 @@ public class TutorialSequence {
             return addTutorialItem(tutorialItem);
         }
 
-        public Builder addTutorialItem(View view, TutorialTargetType targetType, @StringRes int titleId, @StringRes int descriptionId, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndsListener onTutorialEndsListener) {
-            TutorialItem tutorialItem = new TutorialItem(view, targetType, titleId, descriptionId, onTutorialShowListener, onTutorialEndsListener);
+        public Builder addTutorialItem(View view, TutorialTargetType targetType, @StringRes int titleId, @StringRes int descriptionId, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndListener onTutorialEndListener) {
+            TutorialItem tutorialItem = new TutorialItem(view, targetType, titleId, descriptionId, onTutorialShowListener, onTutorialEndListener);
             return addTutorialItem(tutorialItem);
         }
 

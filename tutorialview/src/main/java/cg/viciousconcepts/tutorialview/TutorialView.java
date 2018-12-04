@@ -50,7 +50,11 @@ import cg.viciousconcepts.tutorialview.models.TutorialTargetType;
 
 public class TutorialView extends FrameLayout {
 
-    public interface OnTutorialEndsListener {
+    public interface OnTutorialDoneListener {
+        void onTutorialDone();
+    }
+
+    public interface OnTutorialEndListener {
         void onTutorialEnds();
     }
 
@@ -67,7 +71,8 @@ public class TutorialView extends FrameLayout {
     private View target;
     private CharSequence title;
     private CharSequence description;
-    private OnTutorialEndsListener onTutorialEndsListener;
+    private OnTutorialDoneListener onTutorialDoneListener;
+    private OnTutorialEndListener onTutorialEndListener;
     private OnTutorialShowListener onTutorialShowListener;
 
     private boolean isShowing;
@@ -157,12 +162,20 @@ public class TutorialView extends FrameLayout {
         this.description = description;
     }
 
-    public OnTutorialEndsListener getOnTutorialEndsListener() {
-        return onTutorialEndsListener;
+    public OnTutorialDoneListener getOnTutorialDoneListener() {
+        return onTutorialDoneListener;
     }
 
-    public void setOnTutorialEndsListener(OnTutorialEndsListener onTutorialEndsListener) {
-        this.onTutorialEndsListener = onTutorialEndsListener;
+    public void setOnTutorialDoneListener(OnTutorialDoneListener onTutorialDoneListener) {
+        this.onTutorialDoneListener = onTutorialDoneListener;
+    }
+
+    public OnTutorialEndListener getOnTutorialEndListener() {
+        return onTutorialEndListener;
+    }
+
+    public void setOnTutorialEndListener(OnTutorialEndListener onTutorialEndListener) {
+        this.onTutorialEndListener = onTutorialEndListener;
     }
 
     public OnTutorialShowListener getOnTutorialShowListener() {
@@ -192,13 +205,16 @@ public class TutorialView extends FrameLayout {
         dismiss(false);
     }
 
-    public void dismiss(boolean force) {
+    public void dismiss(boolean forceClose) {
         if (isShowing) {
             ViewGroup viewGroup = ((ViewGroup) getParent());
             if (viewGroup != null) viewGroup.removeView(this);
 
-            if (onTutorialEndsListener != null && !force) {
-                onTutorialEndsListener.onTutorialEnds();    // TODO: make onTutorialEnds Action on dismiss(force = true)
+            if (onTutorialEndListener != null && forceClose) {
+                onTutorialEndListener.onTutorialEnds();
+            }
+            if (onTutorialDoneListener != null && !forceClose) {
+                onTutorialDoneListener.onTutorialDone();
             }
         }
     }
@@ -234,7 +250,7 @@ public class TutorialView extends FrameLayout {
 
         private boolean isPerformClickOnTarget = false;
 
-        public Builder(Activity activity) {
+        Builder(Activity activity) {
             this.activity = activity;
             this.tutorialView = new TutorialView(activity);
             this.parent = activity.findViewById(android.R.id.content);
@@ -300,35 +316,40 @@ public class TutorialView extends FrameLayout {
             return this;
         }
 
-        public Builder setContentTitle(@StringRes int resId) {
+        Builder setContentTitle(@StringRes int resId) {
             return setContentTitle(activity.getString(resId));
         }
 
-        public Builder setContentTitle(CharSequence title) {
+        Builder setContentTitle(CharSequence title) {
             tutorialView.setTitle(title);
             return this;
         }
 
-        public Builder setContentDescription(@StringRes int resId) {
+        Builder setContentDescription(@StringRes int resId) {
             return setContentDescription(activity.getString(resId));
         }
 
-        public Builder setContentDescription(CharSequence description) {
+        Builder setContentDescription(CharSequence description) {
             tutorialView.setDescription(description);
             return this;
         }
 
-        public Builder setOnTutorialEndsListener(OnTutorialEndsListener onTutorialEndsListener) {
-            tutorialView.setOnTutorialEndsListener(onTutorialEndsListener);
+        Builder setOnTutorialDoneListener(OnTutorialDoneListener onTutorialDoneListener) {
+            tutorialView.setOnTutorialDoneListener(onTutorialDoneListener);
             return this;
         }
 
-        public Builder setOnTutorialShowListener(OnTutorialShowListener onTutorialShowListener) {
+        Builder setOnTutorialEndsListener(OnTutorialEndListener onTutorialEndListener) {
+            tutorialView.setOnTutorialEndListener(onTutorialEndListener);
+            return this;
+        }
+
+        Builder setOnTutorialShowListener(OnTutorialShowListener onTutorialShowListener) {
             this.tutorialView.setOnTutorialShowListener(onTutorialShowListener);
             return this;
         }
 
-        public Builder setPerformClickOnTarget(boolean performClickOnTarget) {
+        Builder setPerformClickOnTarget(boolean performClickOnTarget) {
             this.isPerformClickOnTarget = performClickOnTarget;
             return this;
         }

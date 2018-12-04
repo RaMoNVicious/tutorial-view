@@ -38,7 +38,7 @@ public class TutorialItem {
     private boolean isPerformViewClick;
     private boolean isShowOnce;
     private TutorialView.OnTutorialShowListener onTutorialShowListener;
-    private TutorialView.OnTutorialEndsListener onTutorialEndsListener;
+    private TutorialView.OnTutorialEndListener onTutorialEndListener;
 
     public TutorialItem(@NonNull View target, TutorialTargetType targetType, @StringRes int title, @StringRes int description) {
         this.target = target;
@@ -48,10 +48,10 @@ public class TutorialItem {
         this.isPerformViewClick = false;
         this.isShowOnce = true;
         this.onTutorialShowListener = null;
-        this.onTutorialEndsListener = null;
+        this.onTutorialEndListener = null;
     }
 
-    public TutorialItem(@NonNull View target, TutorialTargetType targetType, @StringRes int title, @StringRes int description, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndsListener onTutorialEndsListener) {
+    public TutorialItem(@NonNull View target, TutorialTargetType targetType, @StringRes int title, @StringRes int description, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndListener onTutorialEndListener) {
         this.target = target;
         this.targetType = targetType;
         this.title = target.getContext().getResources().getString(title);
@@ -59,7 +59,7 @@ public class TutorialItem {
         this.isPerformViewClick = false;
         this.isShowOnce = true;
         this.onTutorialShowListener = onTutorialShowListener;
-        this.onTutorialEndsListener = onTutorialEndsListener;
+        this.onTutorialEndListener = onTutorialEndListener;
     }
 
     public TutorialItem(@NonNull View target, TutorialTargetType targetType, String title, String description) {
@@ -70,10 +70,10 @@ public class TutorialItem {
         this.isPerformViewClick = false;
         this.isShowOnce = true;
         this.onTutorialShowListener = null;
-        this.onTutorialEndsListener = null;
+        this.onTutorialEndListener = null;
     }
 
-    public TutorialItem(@NonNull View target, TutorialTargetType targetType, String title, String description, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndsListener onTutorialEndsListener) {
+    public TutorialItem(@NonNull View target, TutorialTargetType targetType, String title, String description, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndListener onTutorialEndListener) {
         this.target = target;
         this.targetType = targetType;
         this.title = title;
@@ -81,7 +81,7 @@ public class TutorialItem {
         this.isPerformViewClick = false;
         this.isShowOnce = true;
         this.onTutorialShowListener = onTutorialShowListener;
-        this.onTutorialEndsListener = onTutorialEndsListener;
+        this.onTutorialEndListener = onTutorialEndListener;
     }
 
     public View getTarget() {
@@ -140,11 +140,11 @@ public class TutorialItem {
         this.onTutorialShowListener = onTutorialShowListener;
     }
 
-    public TutorialView.OnTutorialEndsListener getOnTutorialEndsListener() {
-        return onTutorialEndsListener;
+    public TutorialView.OnTutorialEndListener getOnTutorialEndListener() {
+        return onTutorialEndListener;
     }
 
-    public void setOnTutorialEndsListener(TutorialView.OnTutorialEndsListener onTutorialEndsListener) {
-        this.onTutorialEndsListener = onTutorialEndsListener;
+    public void setOnTutorialEndListener(TutorialView.OnTutorialEndListener onTutorialEndListener) {
+        this.onTutorialEndListener = onTutorialEndListener;
     }
 }
