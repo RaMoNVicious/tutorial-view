@@ -38,6 +38,7 @@ public class TutorialItem {
     private boolean isPerformViewClick;
     private boolean isShowOnce;
     private TutorialView.OnTutorialShowListener onTutorialShowListener;
+    private TutorialView.OnTutorialEndListener onTutorialEndListener;
 
     public TutorialItem(@NonNull View target, TutorialTargetType targetType, @StringRes int title, @StringRes int description) {
         this.target = target;
@@ -47,9 +48,10 @@ public class TutorialItem {
         this.isPerformViewClick = false;
         this.isShowOnce = true;
         this.onTutorialShowListener = null;
+        this.onTutorialEndListener = null;
     }
 
-    public TutorialItem(@NonNull View target, TutorialTargetType targetType, @StringRes int title, @StringRes int description, TutorialView.OnTutorialShowListener onTutorialShowListener) {
+    public TutorialItem(@NonNull View target, TutorialTargetType targetType, @StringRes int title, @StringRes int description, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndListener onTutorialEndListener) {
         this.target = target;
         this.targetType = targetType;
         this.title = target.getContext().getResources().getString(title);
@@ -57,6 +59,7 @@ public class TutorialItem {
         this.isPerformViewClick = false;
         this.isShowOnce = true;
         this.onTutorialShowListener = onTutorialShowListener;
+        this.onTutorialEndListener = onTutorialEndListener;
     }
 
     public TutorialItem(@NonNull View target, TutorialTargetType targetType, String title, String description) {
@@ -66,9 +69,11 @@ public class TutorialItem {
         this.description = description;
         this.isPerformViewClick = false;
         this.isShowOnce = true;
+        this.onTutorialShowListener = null;
+        this.onTutorialEndListener = null;
     }
 
-    public TutorialItem(@NonNull View target, TutorialTargetType targetType, String title, String description, TutorialView.OnTutorialShowListener onTutorialShowListener) {
+    public TutorialItem(@NonNull View target, TutorialTargetType targetType, String title, String description, TutorialView.OnTutorialShowListener onTutorialShowListener, TutorialView.OnTutorialEndListener onTutorialEndListener) {
         this.target = target;
         this.targetType = targetType;
         this.title = title;
@@ -76,6 +81,7 @@ public class TutorialItem {
         this.isPerformViewClick = false;
         this.isShowOnce = true;
         this.onTutorialShowListener = onTutorialShowListener;
+        this.onTutorialEndListener = onTutorialEndListener;
     }
 
     public View getTarget() {
@@ -132,5 +138,13 @@ public class TutorialItem {
 
     public void setOnTutorialShowListener(TutorialView.OnTutorialShowListener onTutorialShowListener) {
         this.onTutorialShowListener = onTutorialShowListener;
+    }
+
+    public TutorialView.OnTutorialEndListener getOnTutorialEndListener() {
+        return onTutorialEndListener;
+    }
+
+    public void setOnTutorialEndListener(TutorialView.OnTutorialEndListener onTutorialEndListener) {
+        this.onTutorialEndListener = onTutorialEndListener;
     }
 }

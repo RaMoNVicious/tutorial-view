@@ -30,6 +30,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import cg.viciousconcepts.tutorialview.models.TargetPosition;
@@ -49,7 +50,11 @@ import cg.viciousconcepts.tutorialview.models.TutorialTargetType;
 
 public class TutorialView extends FrameLayout {
 
-    public interface OnTutorialEndsListener {
+    public interface OnTutorialDoneListener {
+        void onTutorialDone();
+    }
+
+    public interface OnTutorialEndListener {
         void onTutorialEnds();
     }
 
@@ -58,19 +63,16 @@ public class TutorialView extends FrameLayout {
     }
 
     FrameLayout frame;
-    ImageView arrowTopLeft;
     ImageView arrowTop;
-    ImageView arrowTopRight;
-    ImageView arrowBottomLeft;
     ImageView arrowBottom;
-    ImageView arrowBottomRight;
     TextView txtTitle;
     TextView txtDescription;
 
     private View target;
     private CharSequence title;
     private CharSequence description;
-    private OnTutorialEndsListener onTutorialEndsListener;
+    private OnTutorialDoneListener onTutorialDoneListener;
+    private OnTutorialEndListener onTutorialEndListener;
     private OnTutorialShowListener onTutorialShowListener;
 
     private boolean isShowing;
@@ -90,12 +92,10 @@ public class TutorialView extends FrameLayout {
         FrameLayout.LayoutParams lpFrame = (FrameLayout.LayoutParams) frame.getLayoutParams();
         switch (targetPosition) {
             default:
-            case BOTTOM_LEFT:
             case BOTTOM_RIGHT:
             case BOTTOM:
                 lpFrame.height = (int) viewRect.top;
                 break;
-            case TOP_LEFT:
             case TOP_RIGHT:
             case TOP:
                 lpFrame.topMargin = (int) viewRect.bottom;
@@ -106,23 +106,37 @@ public class TutorialView extends FrameLayout {
 
         switch (targetPosition) {
             default:
-            case BOTTOM_LEFT:
-                arrowBottomLeft.setImageResource(R.drawable.ic_arrow_bottom_left);
+            case TOP:
+                arrowTop.setImageResource(R.drawable.ic_arrow_top);
+                arrowTop.post(() -> {
+                    LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) arrowTop.getLayoutParams();
+                    lp.setMargins(Math.max((int)viewRect.centerX(), getResources().getDimensionPixelSize(R.dimen.padding_large)), getResources().getDimensionPixelSize(R.dimen.padding_normal), 0, getResources().getDimensionPixelSize(R.dimen.padding_small));
+                    arrowTop.setLayoutParams(lp);
+                });
                 break;
-            case BOTTOM_RIGHT:
-                arrowBottomRight.setImageResource(R.drawable.ic_arrow_bottom_right);
+            case TOP_RIGHT:
+                arrowTop.setImageResource(R.drawable.ic_arrow_top_right);
+                arrowTop.post(() -> {
+                    LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) arrowTop.getLayoutParams();
+                    lp.setMargins((int)viewRect.centerX() -  arrowTop.getMeasuredWidth(), getResources().getDimensionPixelSize(R.dimen.padding_normal), 0, getResources().getDimensionPixelSize(R.dimen.padding_small));
+                    arrowTop.setLayoutParams(lp);
+                });
                 break;
             case BOTTOM:
                 arrowBottom.setImageResource(R.drawable.ic_arrow_bottom);
+                arrowBottom.post(() -> {
+                    LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) arrowBottom.getLayoutParams();
+                    lp.setMargins(Math.max((int)viewRect.centerX(), getResources().getDimensionPixelSize(R.dimen.padding_large)), getResources().getDimensionPixelSize(R.dimen.padding_small), 0, getResources().getDimensionPixelSize(R.dimen.padding_normal));
+                    arrowBottom.setLayoutParams(lp);
+                });
                 break;
-            case TOP_LEFT:
-                arrowTopLeft.setImageResource(R.drawable.ic_arrow_top_left);
-                break;
-            case TOP_RIGHT:
-                arrowTopRight.setImageResource(R.drawable.ic_arrow_top_right);
-                break;
-            case TOP:
-                arrowTop.setImageResource(R.drawable.ic_arrow_top);
+            case BOTTOM_RIGHT:
+                arrowBottom.setImageResource(R.drawable.ic_arrow_bottom_right);
+                arrowBottom.post(() -> {
+                    LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) arrowBottom.getLayoutParams();
+                    lp.setMargins((int)viewRect.centerX() -  arrowBottom.getMeasuredWidth(), getResources().getDimensionPixelSize(R.dimen.padding_small), 0, getResources().getDimensionPixelSize(R.dimen.padding_normal));
+                    arrowBottom.setLayoutParams(lp);
+                });
                 break;
         }
     }
@@ -148,12 +162,20 @@ public class TutorialView extends FrameLayout {
         this.description = description;
     }
 
-    public OnTutorialEndsListener getOnTutorialEndsListener() {
-        return onTutorialEndsListener;
+    public OnTutorialDoneListener getOnTutorialDoneListener() {
+        return onTutorialDoneListener;
     }
 
-    public void setOnTutorialEndsListener(OnTutorialEndsListener onTutorialEndsListener) {
-        this.onTutorialEndsListener = onTutorialEndsListener;
+    public void setOnTutorialDoneListener(OnTutorialDoneListener onTutorialDoneListener) {
+        this.onTutorialDoneListener = onTutorialDoneListener;
+    }
+
+    public OnTutorialEndListener getOnTutorialEndListener() {
+        return onTutorialEndListener;
+    }
+
+    public void setOnTutorialEndListener(OnTutorialEndListener onTutorialEndListener) {
+        this.onTutorialEndListener = onTutorialEndListener;
     }
 
     public OnTutorialShowListener getOnTutorialShowListener() {
@@ -173,12 +195,8 @@ public class TutorialView extends FrameLayout {
         frame = ((Activity) getContext()).findViewById(R.id.frame);
         txtTitle = ((Activity) getContext()).findViewById(R.id.txtTitle);
         txtDescription = ((Activity) getContext()).findViewById(R.id.txtDescription);
-        arrowTopLeft = ((Activity) getContext()).findViewById(R.id.arrowTopLeft);
         arrowTop = ((Activity) getContext()).findViewById(R.id.arrowTop);
-        arrowTopRight = ((Activity) getContext()).findViewById(R.id.arrowTopRight);
-        arrowBottomLeft = ((Activity) getContext()).findViewById(R.id.arrowBottomLeft);
         arrowBottom = ((Activity) getContext()).findViewById(R.id.arrowBottom);
-        arrowBottomRight = ((Activity) getContext()).findViewById(R.id.arrowBottomRight);
 
         fadeInShowcase();
     }
@@ -187,13 +205,16 @@ public class TutorialView extends FrameLayout {
         dismiss(false);
     }
 
-    public void dismiss(boolean force) {
+    public void dismiss(boolean forceClose) {
         if (isShowing) {
             ViewGroup viewGroup = ((ViewGroup) getParent());
             if (viewGroup != null) viewGroup.removeView(this);
 
-            if (onTutorialEndsListener != null && !force) {
-                onTutorialEndsListener.onTutorialEnds();
+            if (onTutorialEndListener != null && forceClose) {
+                onTutorialEndListener.onTutorialEnds();
+            }
+            if (onTutorialDoneListener != null && !forceClose) {
+                onTutorialDoneListener.onTutorialDone();
             }
         }
     }
@@ -229,7 +250,7 @@ public class TutorialView extends FrameLayout {
 
         private boolean isPerformClickOnTarget = false;
 
-        public Builder(Activity activity) {
+        Builder(Activity activity) {
             this.activity = activity;
             this.tutorialView = new TutorialView(activity);
             this.parent = activity.findViewById(android.R.id.content);
@@ -295,40 +316,40 @@ public class TutorialView extends FrameLayout {
             return this;
         }
 
-        public Builder setContentTitle(@StringRes int resId) {
+        Builder setContentTitle(@StringRes int resId) {
             return setContentTitle(activity.getString(resId));
         }
 
-        public Builder setContentTitle(CharSequence title) {
+        Builder setContentTitle(CharSequence title) {
             tutorialView.setTitle(title);
             return this;
         }
 
-        public Builder setContentDescription(@StringRes int resId) {
+        Builder setContentDescription(@StringRes int resId) {
             return setContentDescription(activity.getString(resId));
         }
 
-        public Builder setContentDescription(CharSequence description) {
+        Builder setContentDescription(CharSequence description) {
             tutorialView.setDescription(description);
             return this;
         }
 
-        public Builder setOnClickListener(OnClickListener onClickListener) {
-            tutorialView.setOnClickListener(onClickListener);
+        Builder setOnTutorialDoneListener(OnTutorialDoneListener onTutorialDoneListener) {
+            tutorialView.setOnTutorialDoneListener(onTutorialDoneListener);
             return this;
         }
 
-        public Builder setOnTutorialEndsListener(OnTutorialEndsListener onTutorialEndsListener) {
-            tutorialView.setOnTutorialEndsListener(onTutorialEndsListener);
+        Builder setOnTutorialEndsListener(OnTutorialEndListener onTutorialEndListener) {
+            tutorialView.setOnTutorialEndListener(onTutorialEndListener);
             return this;
         }
 
-        public Builder setOnTutorialShowListener(OnTutorialShowListener onTutorialShowListener) {
+        Builder setOnTutorialShowListener(OnTutorialShowListener onTutorialShowListener) {
             this.tutorialView.setOnTutorialShowListener(onTutorialShowListener);
             return this;
         }
 
-        public Builder setPerformClickOnTarget(boolean performClickOnTarget) {
+        Builder setPerformClickOnTarget(boolean performClickOnTarget) {
             this.isPerformClickOnTarget = performClickOnTarget;
             return this;
         }
