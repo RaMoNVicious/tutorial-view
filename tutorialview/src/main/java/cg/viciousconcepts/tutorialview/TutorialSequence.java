@@ -102,7 +102,7 @@ public class TutorialSequence {
             TutorialItem item = tutorialItems.get(shownItem);
             Log.d(TAG, item.getTitle());
 
-            item.getTarget().post(() -> tutorialView = new TutorialView.Builder(activity)
+            ((View)item.getTarget().getParent()).post(() -> tutorialView = new TutorialView.Builder(activity)
                     .setTarget(item.getTarget(), item.getTargetType())
                     .setContentTitle(item.getTitle())
                     .setContentDescription(item.getDescription())
