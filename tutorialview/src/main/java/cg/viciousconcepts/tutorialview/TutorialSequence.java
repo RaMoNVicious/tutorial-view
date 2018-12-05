@@ -111,7 +111,11 @@ public class TutorialSequence {
                         if (item.getOnTutorialEndListener() != null)
                             item.getOnTutorialEndListener().onTutorialEnds();
                     })
-                    .setOnTutorialDoneListener(this::showNext)
+                    .setOnTutorialDoneListener(() -> {
+                        if (item.getOnTutorialEndListener() != null)
+                            item.getOnTutorialEndListener().onTutorialEnds();
+                        showNext();
+                    })
                     .setOnTutorialShowListener(item.getOnTutorialShowListener())
                     .show());
         } else {
